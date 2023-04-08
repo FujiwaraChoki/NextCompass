@@ -3,5 +3,11 @@ node_modules
 .next
 app
 dist
-.history
-.vscode
+
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+tsconfig.tsbuildinfo
+.env

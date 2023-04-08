@@ -1,25 +1,57 @@
 {
   "private": true,
-  "name": "my-nextron-app",
-  "description": "My application description",
+  "name": "next-compass",
+  "description": "Elevate your AI-Game with Next-Compass!",
   "version": "1.0.0",
-  "author": "Yoshihide Shiono <shiono.yoshihide@gmail.com>",
+  "author": "Sami Hindi <sami@samihindi.com>",
   "main": "app/background.js",
   "scripts": {
     "dev": "nextron",
     "build": "nextron build",
-    "postinstall": "electron-builder install-app-deps"
+    "postinstall": "electron-builder install-app-deps",
+    "prepare": "husky install"
   },
   "dependencies": {
+    "daisyui": "^2.51.5",
     "electron-serve": "^1.1.0",
-    "electron-store": "^8.1.0"
+    "electron-store": "^8.0.1",
+    "next-transpile-modules": "^9.0.0",
+    "react-daisyui": "^2.3.2",
+    "react-icons": "^4.8.0",
+    "react-swipeable": "^7.0.0"
   },
   "devDependencies": {
-    "electron": "^21.3.3",
-    "electron-builder": "^23.6.0",
-    "next": "^12.3.4",
-    "nextron": "^8.5.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "@tailwindcss/typography": "^0.5.4",
+    "@types/node": "^16.11.7",
+    "@types/react": "^18.0.8",
+    "@typescript-eslint/eslint-plugin": "^5.33.1",
+    "@typescript-eslint/parser": "^5.33.1",
+    "autoprefixer": "^10.4.7",
+    "electron": "^18.2.0",
+    "electron-builder": "^23.0.3",
+    "eslint": "^8.22.0",
+    "eslint-config-next": "^12.2.5",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-tailwindcss": "^3.6.0",
+    "eslint-plugin-unused-imports": "^2.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^13.0.3",
+    "next": "^12.1.6",
+    "nextron": "^8.1.0",
+    "postcss": "^8.4.13",
+    "prettier": "^2.7.1",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0",
+    "tailwindcss": "^3.0.24",
+    "typescript": "^4.6.4"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": {}
+    }
+  },
+  "lint-staged": {
+    "*.@(ts|tsx)": "bash -c tsc",
+    "*.@(js|ts|tsx)": "eslint --fix"
   }
 }
