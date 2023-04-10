@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { FiX } from 'react-icons/fi';
 import EmojiPicker from 'emoji-picker-react';
+import deepai from 'deepai';
 
-const Chat = () => {
+const Image = () => {
     const [tab, setTab] = useState(0);
-    const tabNames = ['ChatGPT', 'you.com', 'Bing'];
+    const tabNames = ['ChatGPT', 'DeepAI'];
 
     const [isLoading, setIsLoading] = useState(false);
 
     const [chatgptMessages, setChatGPTMessages] = useState([]);
-    const [youcomMessages, setYoucomMessages] = useState([]);
-    const [bingMessages, setBingMessages] = useState([]);
+    const [deepaiMessages, setYoucomMessages] = useState([]);
 
     const [emojiModal, setEmojiModal] = useState(false);
 
@@ -19,61 +19,30 @@ const Chat = () => {
     };
 
     const [message, setMessage] = useState('');
-
-    const getChatGPTReply = async (prompt) => {
-        // Implement
-    };
-
     const sendMessage = async () => {
         setIsLoading(true);
         if (tab === 0) {
-            chatgptMessages.push({
-                message: message,
-                type: 'user',
-            });
+            // Send request to Dall e 2
 
-            const response = await getChatGPTReply(message);
-            setChatGPTMessages((messages) => [
-                ...messages,
-                {
-                    message: response,
-                    type: 'bot',
-                },
-            ]);
         } else if (tab === 1) {
-            youcomMessages.push({
+            // Send request to DeepAI
+            deepaiMessages.push({
                 message: message,
                 type: 'user',
             });
 
-            // Send request to you.com
-            const response = await fetch(
-                `https://api.betterapi.net/youdotcom/chat?message=${message}&key=LJ3TGSI1X6N476W9Q30JYRV31R5U1XPHGBA`,
-                {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                }
-            ).then((response) => response.json());
+            deepai.setApiKey('8a4974bb-336c-4082-8200-2441bcfec825');
 
-            console.log(response);
-            youcomMessages.push({
-                message: response.message,
+            const resp = await deepai.callStandardApi("text2img", {
+                text: message,
+            });
+
+            console.table(resp);
+
+            deepaiMessages.push({
+                message: resp.output_url,
                 type: 'bot',
             });
-        } else if (tab === 2) {
-            setBingMessages((messages) => [
-                ...messages,
-                {
-                    message: message,
-                    type: 'user',
-                },
-            ]);
-
-            // Send request to Bing
-        } else {
-            console.error('Invalid tab');
         }
 
         setIsLoading(false);
@@ -82,30 +51,33 @@ const Chat = () => {
     return (
         <div className="rounded-g border bg-base-300 m-20">
             <div className="tabs tabs-boxed m-10">
-                <a className={`tab ${tab === 0 && 'tab-active'}`} onClick={() => setTab(0)}>ChatGPT</a>
-                <a className={`tab ${tab === 1 && 'tab-active'}`} onClick={() => setTab(1)}>you.com</a>
-                <a className={`tab ${tab === 2 && 'tab-active'}`} onClick={() => setTab(2)}>Bing</a>
+                <a className={`tab ${tab === 0 && 'tab-active'}`} onClick={() => setTab(0)}>Dall-E 2</a>
+                <a className={`tab ${tab === 1 && 'tab-active'}`} onClick={() => setTab(1)}>DeepAI</a>
                 <a className="tab" onClick={() => {
                     if (tab === 0) {
                         setChatGPTMessages([]);
                     } else if (tab === 1) {
                         setYoucomMessages([]);
-                    } else if (tab === 2) {
-                        setBingMessages([]);
                     }
                 }}>
                     <FiX />
                 </a>
             </div>
 
-            <div className="justify-center px-4 pt-16 pb-5 bg-base-200 relative">
+            <div className="justify-center px-4 pt-16 pb-5 bg-base-200 relative h-max">
                 <h1 className="text-4xl ml-5 -mt-10">{tabNames[tab]}</h1>
 
-                <div className="h-80 flex-1 flex-grow overflow-y-auto px-4 py-2">
-                    {(tab === 0 ? chatgptMessages : tab === 1 ? youcomMessages : bingMessages).slice(0).reverse().map((message, index) => {
+                <div className="h-80 flex-1 flex-grow overflow-y-auto px-4 py-2 m-5">
+                    {(tab === 0 ? chatgptMessages : tab === 1 && deepaiMessages).slice(0).reverse().map((message, index) => {
                         return (
                             <div key={index} className={`chat ${message.type === 'user' ? 'chat-end' : 'chat-start'}`} >
-                                <div className="chat-bubble chat-bubble-accent">{message.message}</div>
+                                <div className="chat-bubble chat-bubble-accent">{
+                                    message.message.startsWith('http') ? (
+                                        <img src={message.message} alt="Image" className="w-64 h-64" />
+                                    ) : (
+                                        message.message
+                                    )
+                                }</div>
                             </div>
                         );
                     }).reverse()}
@@ -120,7 +92,7 @@ const Chat = () => {
                 )}
 
                 <form className="flex-1">
-                    <label htmlFor="chat" className="sr-only">Your message</label>
+                    <label htmlFor="chat" className="sr-only">Describe your image...</label>
                     <div className="flex items-center px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700">
                         {
                             isLoading && (
@@ -136,7 +108,7 @@ const Chat = () => {
                         </button>
                         <input onChange={(e) => {
                             setMessage(e.target.value);
-                        }} value={message} id="chat" type="text" className={`block mx-4 p-3.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 ${isLoading && 'disabled'}`} placeholder="Your message..."></input>
+                        }} value={message} id="chat" type="text" className={`block mx-4 p-3.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 ${isLoading && 'disabled'}`} placeholder="Descibe your image..."></input>
                         <button onClick={sendMessage} type="button" className="inline-flex justify-center p-2 text-blue-600 rounded-full cursor-pointer hover:bg-blue-100 dark:text-blue-500 dark:hover:bg-gray-600">
                             <svg aria-hidden="true" className="w-6 h-6 rotate-90" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
                             <span className="sr-only">Send message</span>
@@ -148,4 +120,4 @@ const Chat = () => {
     )
 }
 
-export default Chat
+export default Image;
